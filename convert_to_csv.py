@@ -1,44 +1,43 @@
 import json
 import csv
 
-with open('ctg-studies(3).json', 'r') as json_file:
-    data = json.load(json_file)
+def extract_data_from_json_list(json_file_path, csv_file_path):
+    # Define the headers
+    headers = ['NCT Number', 'Study Title', 'Study Status', 'Study URL', 'Sponser', 'Condition', 'Study Type', 'Intervention']
 
+    # Load the JSON file
+    with open(json_file_path, 'r') as json_file:
+        data_list = json.load(json_file)
+    
+    # Prepare the CSV file for writing
+    with open(csv_file_path, 'w', newline='') as csv_file:
+        writer = csv.writer(csv_file)
+        
+        # Write the headers
+        writer.writerow(headers)
+        
+        # loop through each trial and extract its data
+        for data in data_list:
+            
+            # To get the values of Intervention list
+            Intervention_list=data['protocolSection'].get('armsInterventionsModule', {}).get('interventions', [])
+            # To get the values from the dictionaries inside the Intervention_list as a single string
+            Intervention_names = '| '.join([intervention['name'] for intervention in Intervention_list if 'name' in intervention])
 
-def flatten_json(data):
+            # Extract the desired fields from each JSON object
+            extracted_data = {
+                'NCT Number': data['protocolSection']['identificationModule'].get('nctId',''),
+                'Study Title': data['protocolSection']['identificationModule'].get('briefTitle', ''),
+                'Study Status': data['protocolSection']['statusModule'].get('overallStatus', ''),
+                'Study URL':"https://clinicaltrials.gov/study/"+data['protocolSection']['identificationModule'].get('nctId',''),
+                'Sponser':data['protocolSection']['sponsorCollaboratorsModule']['leadSponsor'].get('name', ''),
+                'Condition':'| '.join(data['protocolSection']['conditionsModule'].get('conditions', [])),
+                'Study type':data['protocolSection']['designModule'].get('studyType', ''),
+                'Interventions': Intervention_names
+            }
 
-    # Flatten a nested JSON structure to a flat dictionary.
-    flattened = {}
+            # Write the data
+            writer.writerow(extracted_data.values())
 
-    def flatten(item, name=''):
-        if type(item) is dict:
-            for key in item:
-                flatten(item[key], name + key + '_')
-        elif type(item) is list:
-            i = 0
-            for value in item:
-                flatten(value, name + str(i) + '_')
-                i += 1
-        else:
-            flattened[name[:-1]] = item
-
-    flatten(data)
-    return flattened
-
-def convert_json_to_csv(json_data, csv_file):
-   
-    # Convert JSON data to CSV and save it to a file.
-  
-    flattened_data = flatten_json(json_data)
-    # print(flattened_data)
-    with open(csv_file, 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=flattened_data.keys())
-        writer.writeheader()
-        writer.writerow(flattened_data)
-
-csv_file = 'output.csv'
-convert_json_to_csv(data, csv_file)
-print(f"JSON data successfully converted and saved to {csv_file}")
-
-
-
+# Example usage
+extract_data_from_json_list('ctg-studies(6).json', 'data.csv')

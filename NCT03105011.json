@@ -1,0 +1,31 @@
+{
+    "protocolSection": {
+        "identificationModule": {
+            "nctId": "NCT03105011",
+            "briefTitle": "Utilizing Off-the-shelf Technology to Improve Diabetes Management in a Rural Population"
+        },
+        "statusModule": {
+            "overallStatus": "COMPLETED"
+        },
+        "sponsorCollaboratorsModule": {
+            "leadSponsor": {
+                "name": "University of Missouri-Columbia"
+            }
+        },
+        "conditionsModule": {
+            "conditions": [
+                "Diabetes"
+            ]
+        },
+        "designModule": {
+            "studyType": "INTERVENTIONAL"
+        },
+        "armsInterventionsModule": {
+            "interventions": [
+                {
+                    "name": "EpxDiabetes software"
+                }
+            ]
+        }
+    }
+}
